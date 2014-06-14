@@ -1,0 +1,131 @@
+1)
+Load the cement data using the commands:
+library(AppliedPredictiveModeling)
+data(concrete)
+library(caret)
+set.seed(975)
+inTrain = createDataPartition(mixtures$CompressiveStrength, p = 3/4)[[1]]
+training = mixtures[ inTrain,]
+testing = mixtures[-inTrain,]
+Make a plot of the outcome (CompressiveStrength) versus the index of the samples. Color by each of the variables in the data set (you may find the cut2() function in the Hmisc package useful for turning continuous covariates into factors). What do you notice in these plots?
+
+r:
+qplot(1:dim(training)[1],Superplasticizer,data=training,colour=cut2(1:dim(training)[1],m=200,g=4))
+
+
+2)
+Load the Alzheimer's disease data using the commands:
+set.seed(3433)
+library(AppliedPredictiveModeling)
+data(AlzheimerDisease)
+adData = data.frame(diagnosis,predictors)
+inTrain = createDataPartition(adData$diagnosis, p = 3/4)[[1]]
+training = adData[ inTrain,]
+testing = adData[-inTrain,]
+Find all the predictor variables in the training set that begin with IL. Perform principal components on these variables with the preProcess() function from the caret package. Calculate the number of principal components needed to capture 80% of the variance. How many are there?
+
+r:
+index=grep("^IL(.*)",colnames(training))
+alzhaimerSubset=subset(training,select=c(index))
+pre=preProcess(alzhaimerSubset,thresh=0.8,method="pca")
+7  principal components   are needed to capture  80% of  variance
+
+<h1>3) MACHINE LEARNING  GLM  WITH PCA  ON  Alzheimer<h1>
+Load the Alzheimer's disease data using the commands:
+set.seed(3433)
+library(AppliedPredictiveModeling)
+data(AlzheimerDisease)
+adData = data.frame(diagnosis,predictors)
+inTrain = createDataPartition(adData$diagnosis, p = 3/4)[[1]]
+training = adData[ inTrain,]
+testing = adData[-inTrain,]
+Create a training data set consisting of only the predictors with variable names beginning with IL and the diagnosis. Build two predictive models, one using the predictors as they are and one using PCA with principal components explaining 80% of the variance in the predictors. Use method="glm" in the train function. What is the accuracy of each method in the test set? Which is more accurate?
+
+r:
+#subset  the predictors
+
+index=grep("^IL(.*)",colnames(predictors)
+subsetpredictors=subset(predictors,select=c(index))
+
+#create  new  data frame
+adDatasub = data.frame(diagnosis,subsetpredictors)
+
+#new  data slicing resulting  with  slicing  on subseted  data
+inTrain = createDataPartition(adDatasub$diagnosis, p = 3/4)[[1]]
+training = adDatasub[ inTrain,]
+testing = adDatasub[-inTrain,] 
+
+<h2>#FIRST PREDICTIVE MODEL</h2>
+
+*training  the model 
+
+m1=train(diagnosis~.,data=training,method="glm")
+
+*predicting  with the test  set
+
+prediction1=predict(m1,newdata=testing)
+
+* computing  accuracy on model1
+
+mean(testing$diagnosis==prediction1)
+ 0.6463415
+ 
+ 
+<h2>#SECOND PREDICTIVE MODEL</h2>
+
+#preprocess  with  PCA  in order to obtain  the  predictors with 80% variance
+
+pre=preProcess(training[,-1],thresh=0.8,method="pca")
+trainPC=predict(pre,training[,-1])
+testPC=predict(pre,testing[,-1])
+
+* training the model 
+m2=train(training$diagnosis~.,data=trainPC,method="glm"
+
+*predicting with test set 
+
+prediction2=predict(m2,testPC)
+
+*accuracy with confusion matrix
+
+confusionMatrix(testing$diagnosis,prediction2)
+
+0.7195
+
+
+
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
