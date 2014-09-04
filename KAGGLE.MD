@@ -1,4 +1,4 @@
-TITANIC PROBLEM 
+TITANIC PROBLEM ----https://www.kaggle.com/c/titanic-gettingStarted/leaderboard
 
  #classsification problem ( discrette  values of output)
 library(caret)
