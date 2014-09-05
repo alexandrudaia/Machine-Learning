@@ -53,7 +53,7 @@ plot(train[,"temp"],train[,"atemp"])#visualize the correlation
 # -->> SVD(reduce  noise and  number  of predictors)
 #rorate  the plot
 x=0.71*train$temp+0.71*train$atemp
-y=0.71*train$temp-0.71*train$atemp
+y=0.71*train$temp-0.71*train$atemp 
 plot(x,y)
 
 
