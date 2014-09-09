@@ -1,5 +1,6 @@
 BIKE SHARING   COMPETITION-
 
+
 setwd("C:/Users/Home/Desktop/bikesharing")
 library(caret)
 library(ISLR)
@@ -8,11 +9,22 @@ data=read.table("train.csv",header=F,sep=",",skip=1)
 cnames=readLines("train.csv",1)
 cnames=strsplit(cnames,",",fixed=T)
 names(data)=make.names(cnames[[1]])
+train=read.table("train.csv",header=F,sep=",",skip=1)
+cnames=readLines("train.csv",1)
+cnames=strsplit(cnames,",",fixed=T)
+names(train)=make.names(cnames[[1]])
+#
+test=read.table("test.csv",header=F,sep=",",skip=1)
+cnames=readLines("test.csv",1)
+cnames=strsplit(cnames,",",fixed=T)
+names(test)=make.names(cnames[[1]])
 #1  we  don't need  to remove any  column since  all  provides  information
 #we may remove  casual and  reigstred and  holidady(according to  3')
-data=data[,-c(3,10,11)]
+train=train[,-c(3,10,11)]
+test=test[,-3]
 #get only the  hour from  date  time
-data$datetime=as.POSIXlt(data$datetime)$hour
+train$datetime=as.POSIXlt(train$datetime)$hour
+test$datetime=as.POSIXlt(test$datetime)$hour
 #1'-simple prediction -  with lm  and one  predictor based on 3)
 lm1=lm(count~atemp,data=train)
 summary(lm1)
@@ -77,5 +89,22 @@ write.table(p,file="pred.csv",sep=",",row.names=F)
 #Diagnostics
 model=modelFitAll$finalModel
 plot(model,1,pch=19,cex=0.5,col="#00000010")
+#bagging  example  for ozone
+library(ElemStatLearn)
+data(ozone,package="ElemStatLearn")
+ozone=ozone[order(order$ozone),]
+ll=matrix(NA,nrow=10,ncol=155)
+for(i in 1:10){
+  + ss=sample(1:dim(ozone)[1],replace=T)
+  + ozone0=ozone[ss,];ozone0=ozone0[order(ozone0$ozone),]
+  + loess0=loess(temperature~ozone,data=ozone0,span=0.2)
+  + ll[i,]=predict(loess0,newdata=data.frame(ozone=1:155))
+  + }
+plot(ozone$ozone,ozone$temperature,pch=19,cex=0.5)
+for(i in 1:10) {
+lines(1:155,ll[i,],col="grey",lwd=2)}
+lines(1:155,apply(ll,2,mean),col="red",lwd=2)
+#PREDICTING USING   BOOSTING  WITH  TREES
+modFit=train(count~.,method="gbm",data=train,verbose=F)
+pred=predict(modFit,test)
 
- 
